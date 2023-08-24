@@ -5,6 +5,6 @@ require_once("courses.php");
 
 # Haetaan kurssitiedot ja tulostetaan ne ulos JSON-muodossa.
 # Huomaa, että PHP-koodissa käsittely kannattaa tehdä assosiatiivisena taulukkona.
-echo json_encode(getCourses(), JSON_UNESCAPED_UNICODE);
+echo json_encode(getCoursesWithSearchData(), JSON_UNESCAPED_UNICODE);
 
 ?>

@@ -136,4 +136,82 @@ function getCourses() {
 
 }
 
+/**
+ * Noutaa kurssien tiedot Wilman avoimesta rajapinnasta ja muodostaa kurssien
+ * tiedoista tekstikoosteen.
+ *
+ * Hakee kurssien tiedot avoimesta rajapinnasta getCourses-funktion avulla
+ * ja koostaa kurssitiedoista yhtenäisen tekstikentän ja siitä lasketun
+ * MD5-hajautustunnisteen. Koostetusta tekstikentästä voidaan tehdä haku
+ * hakusanalla.
+ *
+ * Koostetaulukko on rakenteeltaan seuraavanlainen:
+ *
+ *   [
+ *     { "Id": "1",
+ *       "Caption": "Oppilaitoksen nimi",
+ *       "Courses": [
+ *         { "Id": "3200",
+ *           "PaymentMethod": "0",
+ *           "Koulutus": "Prosessiteollisuuden perustutkinto",
+ *           "Oppilaitos": "Oppilaitoksen nimi",
+ *           "Paikkakunta": "Hämeenkyrö",
+ *           "Tutkintotyyppi": "Ammatillinen perustutkinto",
+ *           "Koulutusala": "Tekniikan alat",
+ *           ...
+ *           "text": "3200\n0\nProsessiteollisuuden perustutkinto\n...",
+ *           "hash": "e18bb67a87e764930d70a81b1e4fd87f"
+ *         },
+ *         { "Id": "3195",
+ *           ...
+ *         }
+ *       ]
+ *     },
+ *     { "Id": "2",
+ *       ...
+ *     }
+ *   ]
+ *
+ * @author Pekka Tapio Aalto <pekka.aalto@sasky.fi>
+ *
+ * @return array Kurssien tiedot ja koosteteksti assosiatiivisessa taulukossa.
+ */
+function getCoursesWithSearchData() {
+
+  # Noudetaan kaikki kurssien tiedot taulukkona käsittelyn pohjaksi.
+  $array = getCourses();
+
+  # Käydään lävitse yksitellen tulosjoukon jokainen oppilaitos.
+  foreach ($array as $schoolindex => $schooldata) {
+
+    # Käydään lävitse yksitellen oppilaitoksen jokainen kurssi.
+    foreach ($schooldata["Courses"] as $courseindex => $coursedata) {
+
+      # Alustetaan muuttuja, johon koostetaan teksti, josta haku suoritetaan.
+      $text = "";
+
+      # Käydään kurssin tiedot yksitellen lävitse.
+      foreach ($coursedata as $key => $value) {
+
+        # Lisätään kentän arvo koostemuuttujan loppuun rivinvaihdon kanssa.
+        $text = $text . "$value\n";
+
+      }
+
+      # Lasketaan koosteesta MD5-hajautustunniste.
+      $hash = md5($text);
+
+      # Lisätään kooste ja hajautustunniste kurssin tietoihin.
+      $array[$schoolindex]["Courses"][$courseindex]["text"] = $text;
+      $array[$schoolindex]["Courses"][$courseindex]["hash"] = $hash;
+
+    }
+
+  }
+
+  # Palautetaan käsitelty taulukko.
+  return $array;
+
+}
+
 ?>
